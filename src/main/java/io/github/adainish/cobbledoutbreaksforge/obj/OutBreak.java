@@ -4,13 +4,14 @@ import ca.landonjw.gooeylibs2.api.tasks.Task;
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
-import com.cobblemon.mod.common.pokemon.Pokemon;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
@@ -36,8 +37,7 @@ public class OutBreak {
     }
 
     public void setSpecies() {
-        Species randomSpecies = RandomHelper.getRandomElementFromCollection(PokemonSpecies.INSTANCE.getSpecies());
-        this.species = randomSpecies;
+        this.species = RandomHelper.getRandomElementFromCollection(PokemonSpecies.INSTANCE.getSpecies());
     }
 
     public boolean shouldSpawnNewPokemon() {
@@ -98,10 +98,16 @@ public class OutBreak {
 
             PokemonProperties pokemonProperties = new PokemonProperties();
             pokemonProperties.setSpecies(species.getName());
-            if (RandomHelper.getRandomChance(shinyChance))
+            boolean isShiny = RandomHelper.getRandomChance(shinyChance);
+            if (isShiny)
                 pokemonProperties.setShiny(true);
             if (nearestPlayer != null) {
+
                 if (pokemonProperties.getSpecies() != null) {
+                    if (isShiny) {
+                        //play sound to nearest player to notify of shiny spawn
+                        nearestPlayer.level.playSound(null, nearestPlayer.getX(), nearestPlayer.getY(), nearestPlayer.getZ(), SoundEvents.GOAT_HORN_PLAY, SoundSource.MASTER, 1.0F, 1.0F);
+                    }
                     PokemonEntity pokemonEntity = pokemonProperties.createEntity(nearestPlayer.getLevel());
                     pokemonEntity.getPersistentData().putBoolean("outbreakmon", true);
                     double newX = RandomHelper.getRandomNumberBetween(outBreakLocation.minX, outBreakLocation.maxX);

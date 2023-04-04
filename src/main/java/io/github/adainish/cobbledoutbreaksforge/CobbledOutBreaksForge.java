@@ -2,7 +2,7 @@ package io.github.adainish.cobbledoutbreaksforge;
 
 import ca.landonjw.gooeylibs2.api.tasks.Task;
 import io.github.adainish.cobbledoutbreaksforge.config.Config;
-import io.github.adainish.cobbledoutbreaksforge.obj.OutBreakLocation;
+import io.github.adainish.cobbledoutbreaksforge.listener.EntityListener;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutbreaksManager;
 import io.github.adainish.cobbledoutbreaksforge.tasks.UpdateOutBreaksRunnable;
 import net.minecraft.server.MinecraftServer;
@@ -85,7 +85,12 @@ public class CobbledOutBreaksForge {
 
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        // Some common setup code
+        log.info("Booting up %n by %authors %v %y"
+                .replace("%n", MOD_NAME)
+                .replace("%authors", AUTHORS)
+                .replace("%v", VERSION)
+                .replace("%y", YEAR)
+        );
         initDirs();
     }
 
@@ -99,15 +104,13 @@ public class CobbledOutBreaksForge {
     @SubscribeEvent
     public void onServerStarted(ServerStartingEvent event) {
         setServer(ServerLifecycleHooks.getCurrentServer());
-        initConfigs();
-        outbreaksManager = new OutbreaksManager();
-        outbreaksManager.loadOutBreakLocations();
-        outbreaksManager.generateOutBreaks();
+        reload();
         taskList.add(Task.builder().infinite().execute(new UpdateOutBreaksRunnable()).interval(20 * 60).build());
+        MinecraftForge.EVENT_BUS.register(new EntityListener());
     }
 
     public void initDirs() {
-        setConfigDir(new File(FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath()).toString() + "/CobbledOutBreaks/"));
+        setConfigDir(new File(FMLPaths.GAMEDIR.get().resolve(FMLConfig.defaultConfigPath()) + "/CobbledOutBreaks/"));
         getConfigDir().mkdir();
         setStorage(new File(getConfigDir(), "/storage/"));
         getStorage().mkdirs();
