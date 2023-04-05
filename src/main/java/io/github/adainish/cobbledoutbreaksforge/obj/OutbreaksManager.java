@@ -1,6 +1,6 @@
 package io.github.adainish.cobbledoutbreaksforge.obj;
 
-import ca.landonjw.gooeylibs2.api.tasks.Task;
+import com.cobblemon.mod.common.api.scheduling.ScheduledTask;
 import com.cobblemon.mod.common.pokemon.Species;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -8,6 +8,8 @@ import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
 import io.github.adainish.cobbledoutbreaksforge.config.Config;
 import io.github.adainish.cobbledoutbreaksforge.util.Adapters;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
+import io.github.adainish.cobbledoutbreaksforge.util.Util;
+import kotlin.Unit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -76,19 +78,27 @@ public class OutbreaksManager
                 OutBreak outBreak = new OutBreak();
                 outBreak.setSpecies();
                 outBreak.time = CobbledOutBreaksForge.config.timerMinutes;
-
+                outBreak.outBreakLocation = RandomHelper.removeRandomElementFromCollection(locationHashMap.values());
                 //do announcement
                 String msg = CobbledOutBreaksForge.config.broadcastMessage;
+                Util.doBroadcast(msg
+                        .replace("%species%", outBreak.species.getName())
+                        .replace("%location%", outBreak.outBreakLocation.prettyLocation()));
 
-                outBreak.outBreakLocation = RandomHelper.removeRandomElementFromCollection(locationHashMap.values());
-                outBreak.runnableTask = Task.builder().infinite().interval(20).execute(task -> {
-                    outBreak.spawnPokemon();
-                }).build();
+                ScheduledTask.Builder builder = new ScheduledTask.Builder();
+                outBreak.runnableTask = builder.infiniteIterations().interval(20)
+                        .execute(scheduledTask -> {
+                            outBreak.spawnPokemon();
+                            return Unit.INSTANCE;
+                        })
+                        .build();
                 outBreak.started = System.currentTimeMillis();
                 outBreakHashMap.put(outBreak.species, outBreak);
             }
         }
     }
+
+
 
     public void cleanExpiredOutBreaks()
     {
@@ -100,7 +110,7 @@ public class OutbreaksManager
         });
         for (Species species : toremove) {
             OutBreak outBreak = outBreakHashMap.get(species);
-            outBreak.runnableTask.setExpired();
+            outBreak.runnableTask.expire();
             outBreakHashMap.remove(species);
         }
     }
@@ -109,7 +119,7 @@ public class OutbreaksManager
     {
         CobbledOutBreaksForge.getLog().warn("Shutting down all ongoing outbreaks");
         outBreakHashMap.forEach((species, outBreak) -> {
-            outBreak.runnableTask.setExpired();
+            outBreak.runnableTask.expire();
             outBreak.killAllOutBreakMons();
         });
         outBreakHashMap.clear();

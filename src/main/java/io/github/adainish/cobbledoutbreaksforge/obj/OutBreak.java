@@ -1,8 +1,8 @@
 package io.github.adainish.cobbledoutbreaksforge.obj;
 
-import ca.landonjw.gooeylibs2.api.tasks.Task;
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
+import com.cobblemon.mod.common.api.scheduling.ScheduledTask;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
@@ -30,7 +30,7 @@ public class OutBreak {
 
     public double shinyChance = 1;
 
-    public transient Task runnableTask;
+    public transient ScheduledTask runnableTask;
 
     public OutBreak() {
 
@@ -81,6 +81,13 @@ public class OutBreak {
         }
         System.out.println("Outbreak counter for %speciestype% = %amount%".replace("%speciestype%", species.getName()).replace("%amount%", String.valueOf(outbreakCounter)));
         return outbreakCounter;
+    }
+
+    public String timeLeft()
+    {
+        String s = "";
+
+        return s;
     }
 
     public boolean expired() {

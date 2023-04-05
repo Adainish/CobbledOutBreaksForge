@@ -1,10 +1,11 @@
 package io.github.adainish.cobbledoutbreaksforge;
 
-import ca.landonjw.gooeylibs2.api.tasks.Task;
+import com.cobblemon.mod.common.api.scheduling.ScheduledTask;
 import io.github.adainish.cobbledoutbreaksforge.config.Config;
 import io.github.adainish.cobbledoutbreaksforge.listener.EntityListener;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutbreaksManager;
 import io.github.adainish.cobbledoutbreaksforge.tasks.UpdateOutBreaksRunnable;
+import kotlin.Unit;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -43,7 +44,7 @@ public class CobbledOutBreaksForge {
 
     public static Config config;
 
-    public List<Task> taskList = new ArrayList<>();
+    public List<ScheduledTask> taskList = new ArrayList<>();
 
     public CobbledOutBreaksForge() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -94,18 +95,10 @@ public class CobbledOutBreaksForge {
         initDirs();
     }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
-
-    }
-
     @SubscribeEvent
     public void onServerStarted(ServerStartingEvent event) {
         setServer(ServerLifecycleHooks.getCurrentServer());
         reload();
-        taskList.add(Task.builder().infinite().execute(new UpdateOutBreaksRunnable()).interval(20 * 60).build());
         MinecraftForge.EVENT_BUS.register(new EntityListener());
     }
 
@@ -124,11 +117,26 @@ public class CobbledOutBreaksForge {
     }
 
     public void reload() {
+        if (!taskList.isEmpty())
+        {
+            for (ScheduledTask t:taskList) {
+                t.expire();
+            }
+            taskList.clear();
+        }
         initConfigs();
         if (outbreaksManager == null) {
             outbreaksManager = new OutbreaksManager();
         }
         outbreaksManager.init();
+        ScheduledTask.Builder builder = new ScheduledTask.Builder();
+        ScheduledTask updateOutBreaksRunnableTask = builder.infiniteIterations().interval(20 * 60)
+                .execute(scheduledTask -> {
+                    new UpdateOutBreaksRunnable();
+                    return Unit.INSTANCE;
+                })
+                .build();
+        taskList.add(updateOutBreaksRunnableTask);
     }
 
 

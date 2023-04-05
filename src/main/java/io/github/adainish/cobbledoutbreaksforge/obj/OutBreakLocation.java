@@ -15,4 +15,10 @@ public class OutBreakLocation
     {
 
     }
+
+    public String prettyLocation()
+    {
+        String pretty = "";
+        return pretty;
+    }
 }

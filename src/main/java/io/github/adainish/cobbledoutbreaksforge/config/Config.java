@@ -21,7 +21,7 @@ public class Config
         this.maxOutBreaks = 5;
         this.shinyChance = 1D;
         this.timerMinutes = 5;
-        this.broadcastMessage = "&cAn outbreak has started with the pokemon %species%";
+        this.broadcastMessage = "&cAn outbreak has started with the pokemon %species% for %time% at %location%";
     }
 
     public static void writeConfig()
