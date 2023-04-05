@@ -70,6 +70,7 @@ public class OutbreaksManager
     public void generateOutBreaks() {
         if (CobbledOutBreaksForge.getServer() != null) {
             if (CobbledOutBreaksForge.getServer().getPlayerCount() <= 0) {
+                CobbledOutBreaksForge.getLog().error("Not enough players online to start an outbreak, requires a minimum of 1");
                 return;
             }
             if (outBreakHashMap.values().size() >= maxOutBreaks)
@@ -77,6 +78,9 @@ public class OutbreaksManager
             while (outBreakHashMap.values().size() < maxOutBreaks) {
                 OutBreak outBreak = new OutBreak();
                 outBreak.setSpecies();
+                if (outBreakHashMap.containsKey(outBreak.species))
+                    continue;
+
                 outBreak.time = CobbledOutBreaksForge.config.timerMinutes;
                 outBreak.outBreakLocation = RandomHelper.removeRandomElementFromCollection(locationHashMap.values());
                 //do announcement
@@ -95,6 +99,8 @@ public class OutbreaksManager
                 outBreak.started = System.currentTimeMillis();
                 outBreakHashMap.put(outBreak.species, outBreak);
             }
+        } else {
+            CobbledOutBreaksForge.getLog().warn("Could not load server instance, failed to start outbreaks");
         }
     }
 

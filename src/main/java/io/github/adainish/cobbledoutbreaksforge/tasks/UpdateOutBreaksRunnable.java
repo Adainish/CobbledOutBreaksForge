@@ -9,13 +9,15 @@ public class UpdateOutBreaksRunnable implements Runnable{
 
         if (CobbledOutBreaksForge.getServer() != null)
         {
-            if (CobbledOutBreaksForge.getServer().getPlayerCount() <= 0)
-                return;
             OutbreaksManager manager = CobbledOutBreaksForge.outbreaksManager;
             if (manager != null) {
                 manager.cleanExpiredOutBreaks();
                 manager.generateOutBreaks();
+            } else {
+                CobbledOutBreaksForge.getLog().error("Failed to load the outbreak manager");
             }
+        } else {
+            CobbledOutBreaksForge.getLog().error("Failed to update outbreak data, server instance null");
         }
     }
 }

@@ -8,6 +8,8 @@ import io.github.adainish.cobbledoutbreaksforge.tasks.UpdateOutBreaksRunnable;
 import kotlin.Unit;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -96,10 +98,17 @@ public class CobbledOutBreaksForge {
     }
 
     @SubscribeEvent
-    public void onServerStarted(ServerStartingEvent event) {
+    public void onServerStarted(ServerStartedEvent event) {
         setServer(ServerLifecycleHooks.getCurrentServer());
         reload();
         MinecraftForge.EVENT_BUS.register(new EntityListener());
+    }
+
+    @SubscribeEvent
+    public void onServerShutDown(ServerStoppingEvent event)
+    {
+        if (outbreaksManager != null)
+            outbreaksManager.shutdown();
     }
 
     public void initDirs() {
