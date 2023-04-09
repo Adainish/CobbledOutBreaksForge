@@ -12,16 +12,22 @@ import java.util.List;
 
 public class Config
 {
+    public boolean usePlayerLocations = false;
     public int maxOutBreaks = 0;
-    public double shinyChance = 0D;
+    public int shinyChance = 0;
     public int timerMinutes = 0;
     public String broadcastMessage = "";
+    public String timerPlaceHolder = "";
+    public String locationPlaceHolder = "";
     public Config()
     {
+        this.usePlayerLocations = false;
         this.maxOutBreaks = 5;
-        this.shinyChance = 1D;
+        this.shinyChance = 1;
         this.timerMinutes = 5;
         this.broadcastMessage = "&cAn outbreak has started with the pokemon %species% for %time% at %location%";
+        this.timerPlaceHolder = "%hours% hours and %minutes% minutes";
+        this.locationPlaceHolder = "Location: %minx% - %maxx%x %miny%-%maxy%y %minz%-%maxz%z";
     }
 
     public static void writeConfig()

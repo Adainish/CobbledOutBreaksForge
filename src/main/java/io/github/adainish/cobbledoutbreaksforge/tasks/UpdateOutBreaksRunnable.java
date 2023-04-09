@@ -4,6 +4,7 @@ import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutbreaksManager;
 
 public class UpdateOutBreaksRunnable implements Runnable{
+
     @Override
     public void run() {
 

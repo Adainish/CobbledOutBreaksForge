@@ -1,5 +1,7 @@
 package io.github.adainish.cobbledoutbreaksforge.obj;
 
+import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
+
 public class OutBreakLocation
 {
 
@@ -18,7 +20,15 @@ public class OutBreakLocation
 
     public String prettyLocation()
     {
-        String pretty = "";
+        String pretty = CobbledOutBreaksForge.config.locationPlaceHolder;
+        pretty = pretty
+                .replace("%minx%", String.valueOf(minX))
+                .replace("%maxx%", String.valueOf(maxX))
+                .replace("%miny%", String.valueOf(minY))
+                .replace("%maxy%", String.valueOf(maxY))
+                .replace("%minz%", String.valueOf(minZ))
+                .replace("%maxz%", String.valueOf(maxZ))
+        ;
         return pretty;
     }
 }

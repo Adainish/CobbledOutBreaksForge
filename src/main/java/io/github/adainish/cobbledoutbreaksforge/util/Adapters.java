@@ -12,4 +12,5 @@ public class Adapters
             .disableHtmlEscaping()
             .excludeFieldsWithModifiers(Modifier.TRANSIENT)
             .create();
+
 }

@@ -1,9 +1,11 @@
 package io.github.adainish.cobbledoutbreaksforge;
 
 import com.cobblemon.mod.common.api.scheduling.ScheduledTask;
+import com.cobblemon.mod.common.api.scheduling.ScheduledTaskTracker;
 import io.github.adainish.cobbledoutbreaksforge.config.Config;
 import io.github.adainish.cobbledoutbreaksforge.listener.EntityListener;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutbreaksManager;
+import io.github.adainish.cobbledoutbreaksforge.scheduler.AsyncScheduler;
 import io.github.adainish.cobbledoutbreaksforge.tasks.UpdateOutBreaksRunnable;
 import kotlin.Unit;
 import net.minecraft.server.MinecraftServer;
@@ -14,7 +16,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -25,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(CobbledOutBreaksForge.MODID)
@@ -46,7 +48,7 @@ public class CobbledOutBreaksForge {
 
     public static Config config;
 
-    public List<ScheduledTask> taskList = new ArrayList<>();
+    public List<AsyncScheduler> taskList = new ArrayList<>();
 
     public CobbledOutBreaksForge() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -128,8 +130,8 @@ public class CobbledOutBreaksForge {
     public void reload() {
         if (!taskList.isEmpty())
         {
-            for (ScheduledTask t:taskList) {
-                t.expire();
+            for (AsyncScheduler t:taskList) {
+                t.stop();
             }
             taskList.clear();
         }
@@ -138,14 +140,17 @@ public class CobbledOutBreaksForge {
             outbreaksManager = new OutbreaksManager();
         }
         outbreaksManager.init();
-        ScheduledTask.Builder builder = new ScheduledTask.Builder();
-        ScheduledTask updateOutBreaksRunnableTask = builder.infiniteIterations().interval(20 * 60)
-                .execute(scheduledTask -> {
-                    new UpdateOutBreaksRunnable();
-                    return Unit.INSTANCE;
-                })
+        startTasks();
+    }
+
+    public void startTasks()
+    {
+
+        AsyncScheduler.Builder builder = new AsyncScheduler.Builder();
+        AsyncScheduler updateOutBreaksRunnableTask = builder.withInfiniteIterations().withInterval(20)
+                .withRunnable(new UpdateOutBreaksRunnable())
                 .build();
-        taskList.add(updateOutBreaksRunnableTask);
+        updateOutBreaksRunnableTask.start();
     }
 
 

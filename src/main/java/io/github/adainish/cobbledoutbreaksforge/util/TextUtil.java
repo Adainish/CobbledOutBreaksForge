@@ -37,40 +37,21 @@ public class TextUtil
         return comp;
     }
 
-    public static String noPermission = "&c(&4!&c) &eYou lack the permission to use this";
-
-
-    public static String toString(String[] a) {
-        if (a == null)
-            return "null";
-        int iMax = a.length - 1;
-        if (iMax == -1)
-            return "";
-
-        StringBuilder b = new StringBuilder();
-        for (int i = 0; ; i++) {
-            b.append(a[i]);
-            if (i == iMax)
-                return b.toString();
-            b.append(" ");
-        }
-    }
-
     public static final TextColor BLUE = TextColor.parseColor("#00AFFC");
     public static final TextColor ORANGE = TextColor.parseColor("#FF6700");
     private static final MutableComponent PLUGIN_PREFIX = Component.literal(Util.formattedString("&c&l[&b&lOutBreaks&c&l]")).setStyle(Style.EMPTY.withColor(BLUE));
 
-    private static final MutableComponent MESSAGE_PREFIX = getPluginPrefix().append(Component.literal(" » &6").setStyle(Style.EMPTY.withColor(ORANGE)));
+    private static final MutableComponent MESSAGE_PREFIX = getPluginPrefix().append(Component.literal(" » ").setStyle(Style.EMPTY.withColor(ORANGE)));
 
     /**
-     * @return a copy of the coloured WonderTrade TextComponent
+     * @return a copy of the coloured OutBreaks TextComponent
      */
     public static MutableComponent getPluginPrefix() {
         return PLUGIN_PREFIX.copy();
     }
 
     /**
-     * @return a copy of the coloured WonderTrade prefix
+     * @return a copy of the coloured OutBreaks prefix
      */
     public static MutableComponent getMessagePrefix() {
         return MESSAGE_PREFIX.copy();

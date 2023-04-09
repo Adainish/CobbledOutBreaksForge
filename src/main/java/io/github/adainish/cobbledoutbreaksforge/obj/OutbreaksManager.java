@@ -1,20 +1,21 @@
 package io.github.adainish.cobbledoutbreaksforge.obj;
 
-import com.cobblemon.mod.common.api.scheduling.ScheduledTask;
 import com.cobblemon.mod.common.pokemon.Species;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
 import io.github.adainish.cobbledoutbreaksforge.config.Config;
+import io.github.adainish.cobbledoutbreaksforge.scheduler.AsyncScheduler;
 import io.github.adainish.cobbledoutbreaksforge.util.Adapters;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
 import io.github.adainish.cobbledoutbreaksforge.util.Util;
-import kotlin.Unit;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -67,10 +68,49 @@ public class OutbreaksManager
         }
     }
 
+    public List<String> alphabet()
+    {
+        return new ArrayList<>(Arrays.asList("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"));
+    }
+
+
+    public String randomIDGenerator()
+    {
+        StringBuilder stringBuilder = new StringBuilder("AutoID");
+        for (int i = 0; i < 10; i++) {
+            stringBuilder.append(RandomHelper.getRandomElementFromCollection(alphabet()));
+        }
+        return stringBuilder.toString();
+    }
+
+    public OutBreakLocation getRandomOutBreakLocation()
+    {
+        OutBreakLocation location = RandomHelper.getRandomElementFromCollection(locationHashMap.values());
+        //check if config
+        if (CobbledOutBreaksForge.config.usePlayerLocations) {
+            //yes? select random player
+            ServerPlayer player = RandomHelper.getRandomElementFromCollection(CobbledOutBreaksForge.getServer().getPlayerList().getPlayers());
+            //make outbreak location from player
+            if (player != null)
+            {
+                location = new OutBreakLocation();
+                location.id = randomIDGenerator();
+                location.minX = player.getX() - 15;
+                location.maxX = player.getX() + 35;
+                location.minY = 0;
+                location.maxY = 255;
+                location.minZ = player.getZ() - 15;
+                location.maxZ = player.getZ() + 35;
+            }
+        }
+
+
+        return location;
+    }
+
     public void generateOutBreaks() {
         if (CobbledOutBreaksForge.getServer() != null) {
             if (CobbledOutBreaksForge.getServer().getPlayerCount() <= 0) {
-                CobbledOutBreaksForge.getLog().error("Not enough players online to start an outbreak, requires a minimum of 1");
                 return;
             }
             if (outBreakHashMap.values().size() >= maxOutBreaks)
@@ -82,20 +122,26 @@ public class OutbreaksManager
                     continue;
 
                 outBreak.time = CobbledOutBreaksForge.config.timerMinutes;
-                outBreak.outBreakLocation = RandomHelper.removeRandomElementFromCollection(locationHashMap.values());
+                outBreak.outBreakLocation = getRandomOutBreakLocation();
+                if (outBreak.outBreakLocation == null)
+                    continue;
+                outBreak.shinyChance = CobbledOutBreaksForge.config.shinyChance;
                 //do announcement
                 String msg = CobbledOutBreaksForge.config.broadcastMessage;
                 Util.doBroadcast(msg
                         .replace("%species%", outBreak.species.getName())
+                                .replace("%time%", outBreak.timeLeft())
                         .replace("%location%", outBreak.outBreakLocation.prettyLocation()));
 
-                ScheduledTask.Builder builder = new ScheduledTask.Builder();
-                outBreak.runnableTask = builder.infiniteIterations().interval(20)
-                        .execute(scheduledTask -> {
-                            outBreak.spawnPokemon();
-                            return Unit.INSTANCE;
-                        })
-                        .build();
+                AsyncScheduler.Builder builder = new AsyncScheduler.Builder();
+                builder.withConsumerTask(c -> {
+                    outBreak.spawnPokemon();
+                });
+                builder.withInfiniteIterations();
+                builder.withInterval(20);
+                AsyncScheduler scheduler = builder.build();
+                scheduler.start();
+                outBreak.scheduler = scheduler;
                 outBreak.started = System.currentTimeMillis();
                 outBreakHashMap.put(outBreak.species, outBreak);
             }
@@ -116,7 +162,7 @@ public class OutbreaksManager
         });
         for (Species species : toremove) {
             OutBreak outBreak = outBreakHashMap.get(species);
-            outBreak.runnableTask.expire();
+            outBreak.scheduler.stop();
             outBreakHashMap.remove(species);
         }
     }
@@ -125,7 +171,7 @@ public class OutbreaksManager
     {
         CobbledOutBreaksForge.getLog().warn("Shutting down all ongoing outbreaks");
         outBreakHashMap.forEach((species, outBreak) -> {
-            outBreak.runnableTask.expire();
+            outBreak.scheduler.stop();
             outBreak.killAllOutBreakMons();
         });
         outBreakHashMap.clear();
