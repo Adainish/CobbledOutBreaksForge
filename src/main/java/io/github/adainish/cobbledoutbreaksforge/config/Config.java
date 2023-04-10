@@ -15,6 +15,8 @@ public class Config
     public boolean usePlayerLocations = false;
     public boolean allowLegends = false;
     public boolean allowUltraBeasts = false;
+    public int minLevel = 5;
+    public int maxLevel = 35;
     public int maxOutBreaks = 0;
     public int shinyChance = 0;
     public int timerMinutes = 0;

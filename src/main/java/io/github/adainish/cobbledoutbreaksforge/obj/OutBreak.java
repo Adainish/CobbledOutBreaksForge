@@ -130,6 +130,8 @@ public class OutBreak {
             ServerPlayer nearestPlayer = (ServerPlayer) RandomHelper.getRandomElementFromCollection(playerList);
             if (nearestPlayer != null) {
                 PokemonProperties pokemonProperties = new PokemonProperties();
+                int randomLevel = RandomHelper.getRandomNumberBetween(CobbledOutBreaksForge.config.minLevel, CobbledOutBreaksForge.config.maxLevel);
+                pokemonProperties.setLevel(randomLevel);
                 pokemonProperties.setSpecies(species.getName());
                 if (pokemonProperties.getSpecies() != null) {
                     double newY = RandomHelper.getRandomNumberBetween(outBreakLocation.minY, outBreakLocation.maxY);//?Replace with highest block y?
