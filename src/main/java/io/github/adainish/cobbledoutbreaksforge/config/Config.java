@@ -20,7 +20,9 @@ public class Config
     public int maxOutBreaks = 0;
     public int shinyChance = 0;
     public int timerMinutes = 0;
+    public int delayMinutes = 0;
     public String broadcastMessage = "";
+    public String finishedBroadCastMessage = "";
     public String timerPlaceHolder = "";
     public String locationPlaceHolder = "";
     public Config()
@@ -31,6 +33,8 @@ public class Config
         this.maxOutBreaks = 5;
         this.shinyChance = 1;
         this.timerMinutes = 5;
+        this.delayMinutes = 1;
+        this.finishedBroadCastMessage = "&cAn outbreak for %species% has finished.";
         this.broadcastMessage = "&cAn outbreak has started with the pokemon %species% for %time% at %location%";
         this.timerPlaceHolder = "%hours% hours and %minutes% minutes";
         this.locationPlaceHolder = "Location: %minx% - %maxx%x %miny%-%maxy%y %minz%-%maxz%z";

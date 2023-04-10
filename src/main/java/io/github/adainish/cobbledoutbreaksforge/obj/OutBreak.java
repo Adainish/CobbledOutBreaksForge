@@ -1,5 +1,6 @@
 package io.github.adainish.cobbledoutbreaksforge.obj;
 
+import com.cobblemon.mod.common.api.drop.DropTable;
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Species;
@@ -61,6 +62,7 @@ public class OutBreak {
     public void killAllOutBreakMons()
     {
         for (PokemonEntity entity:getWildOutBreakMons()) {
+            entity.setDrops(new DropTable());
             entity.setHealth(-1);
         }
         CobbledOutBreaksForge.getLog().warn("Cleared out all outbreak Pokemon");

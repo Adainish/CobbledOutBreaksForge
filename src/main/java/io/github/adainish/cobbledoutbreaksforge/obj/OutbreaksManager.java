@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class OutbreaksManager
 {
@@ -26,6 +27,8 @@ public class OutbreaksManager
     public HashMap<String, OutBreakLocation> locationHashMap = new HashMap<>();
 
     public int maxOutBreaks = 5;
+
+    public long lastOutBreak = 0;
 
     public OutbreaksManager()
     {
@@ -108,12 +111,19 @@ public class OutbreaksManager
         return location;
     }
 
+    public boolean canCreateNewOutBreak()
+    {
+        return System.currentTimeMillis() >= (lastOutBreak + TimeUnit.MINUTES.toMillis(CobbledOutBreaksForge.config.delayMinutes));
+    }
+
     public void generateOutBreaks() {
         if (CobbledOutBreaksForge.getServer() != null) {
             if (CobbledOutBreaksForge.getServer().getPlayerCount() <= 0) {
                 return;
             }
             if (outBreakHashMap.values().size() >= maxOutBreaks)
+                return;
+            if (!canCreateNewOutBreak())
                 return;
             while (outBreakHashMap.values().size() < maxOutBreaks) {
                 OutBreak outBreak = new OutBreak();
@@ -164,7 +174,10 @@ public class OutbreaksManager
             OutBreak outBreak = outBreakHashMap.get(species);
             outBreak.scheduler.stop();
             outBreak.killAllOutBreakMons();
+            if (!CobbledOutBreaksForge.config.finishedBroadCastMessage.isBlank())
+                Util.doBroadcast(CobbledOutBreaksForge.config.finishedBroadCastMessage.replace("%species%", species.getName()));
             outBreakHashMap.remove(species);
+            this.lastOutBreak = System.currentTimeMillis();
         }
     }
 
