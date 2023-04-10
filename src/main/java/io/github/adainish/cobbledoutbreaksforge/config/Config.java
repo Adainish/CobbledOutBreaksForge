@@ -13,6 +13,8 @@ import java.util.List;
 public class Config
 {
     public boolean usePlayerLocations = false;
+    public boolean allowLegends = false;
+    public boolean allowUltraBeasts = false;
     public int maxOutBreaks = 0;
     public int shinyChance = 0;
     public int timerMinutes = 0;
@@ -22,6 +24,8 @@ public class Config
     public Config()
     {
         this.usePlayerLocations = false;
+        this.allowLegends = false;
+        this.allowUltraBeasts = false;
         this.maxOutBreaks = 5;
         this.shinyChance = 1;
         this.timerMinutes = 5;

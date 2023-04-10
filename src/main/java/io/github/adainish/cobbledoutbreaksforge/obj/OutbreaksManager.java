@@ -163,6 +163,7 @@ public class OutbreaksManager
         for (Species species : toremove) {
             OutBreak outBreak = outBreakHashMap.get(species);
             outBreak.scheduler.stop();
+            outBreak.killAllOutBreakMons();
             outBreakHashMap.remove(species);
         }
     }

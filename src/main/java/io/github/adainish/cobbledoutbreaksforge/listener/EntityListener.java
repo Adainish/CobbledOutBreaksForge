@@ -30,7 +30,7 @@ public class EntityListener
                     CobbledOutBreaksForge.getServer().getPlayerList().getPlayers().stream().filter(pl -> pl.distanceTo(pokemonEntity) <= 30).forEach(pl -> {
                         ServerLevel level = pl.getLevel();
                         level.sendParticles(
-                                ParticleTypes.ASH,
+                                ParticleTypes.CRIMSON_SPORE,
                                 pokemonEntity.getX() + ((rand.nextDouble() * 2.0) - 1) * (h + 1),
                                 pokemonEntity.getY() + (rand.nextDouble() * (h + 1)),
                                 pokemonEntity.getZ()+ (((rand.nextDouble() * 2.0) - 1) * (w + 1)),

@@ -1,7 +1,6 @@
 package io.github.adainish.cobbledoutbreaksforge.obj;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
-import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
@@ -11,10 +10,10 @@ import io.github.adainish.cobbledoutbreaksforge.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 
@@ -41,7 +40,18 @@ public class OutBreak {
     }
 
     public void setSpecies() {
-        this.species = RandomHelper.getRandomElementFromCollection(PokemonSpecies.INSTANCE.getImplemented());
+        Species selected = null;
+        while (selected == null)
+        {
+            Species generated = RandomHelper.getRandomElementFromCollection(Util.pokemonList());
+            if (!CobbledOutBreaksForge.config.allowLegends && generated.create(1).isLegendary())
+                continue;
+            if (!CobbledOutBreaksForge.config.allowUltraBeasts && generated.create(1).isUltraBeast())
+                continue;
+            selected = generated;
+
+        }
+        this.species = selected;
     }
 
     public boolean shouldSpawnNewPokemon() {
@@ -131,8 +141,8 @@ public class OutBreak {
                     int randomChance = getRandomChance();
                     if (randomChance <= shinyChance) {
                         pokemonProperties.setShiny(true);
-                        nearestPlayer.playSound(SoundEvents.GOAT_HORN_PLAY);
-//                        nearestPlayer.level.playSound(null, nearestPlayer.getX(), nearestPlayer.getY(), nearestPlayer.getZ(), SoundEvents.GOAT_HORN_PLAY, SoundSource.MUSIC, 100.0F, 100.0F);
+                        SoundEvent soundEvent = SoundEvents.BLAZE_DEATH;
+                        nearestPlayer.level.playSound(null, nearestPlayer.getX(), nearestPlayer.getY(), nearestPlayer.getZ(), soundEvent, SoundSource.PLAYERS, 100.0F, 100.0F);
                     }
                     PokemonEntity pokemonEntity = pokemonProperties.createEntity(nearestPlayer.getLevel());
                     pokemonEntity.getPersistentData().putBoolean("outbreakmon", true);
