@@ -41,7 +41,7 @@ public class Config
         this.shinyChance = 1;
         this.timerMinutes = 5;
         this.delayMinutes = 1;
-        this.maxSpawns = 20;
+        this.maxSpawns = 25;
         this.secondsBetweenSpawns = 2;
         this.finishedBroadCastMessage = "&cAn outbreak for %species% has finished.";
         this.broadcastMessage = "&cAn outbreak has started with the pokemon %species% for %time% at %location%";

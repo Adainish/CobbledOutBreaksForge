@@ -27,13 +27,14 @@ public class OutBreak {
     public Species species;
     public int time = 5;
 
-
     public long started = 0;
 
     public OutBreakLocation outBreakLocation;
 
     public int shinyChance = 1;
     public long lastSpawn = 0;
+
+    public int totalSpawns = 0;
 
     public transient AsyncScheduler scheduler;
 
@@ -69,7 +70,7 @@ public class OutBreak {
         if (!spawnTimerValid())
             return false;
 
-        return currentOutBreakAmount() < CobbledOutBreaksForge.config.maxSpawns;
+        return currentOutBreakAmount() < CobbledOutBreaksForge.config.maxSpawns && totalSpawns < CobbledOutBreaksForge.config.maxSpawns;
     }
 
     public void killAllOutBreakMons()
@@ -124,7 +125,7 @@ public class OutBreak {
         cd = cd - (hours * Util.HOUR_IN_MILLIS);
         long minutes = cd / Util.MINUTE_IN_MILLIS;
 
-        return "%hours% hours and %minutes% minutes".replace("%hours%", String.valueOf(hours)).replace("%minutes%", String.valueOf(minutes));
+        return CobbledOutBreaksForge.config.timerPlaceHolder.replace("%hours%", String.valueOf(hours)).replace("%minutes%", String.valueOf(minutes));
     }
 
     public boolean expired() {
@@ -166,6 +167,7 @@ public class OutBreak {
 
                     pokemonEntity.setPos(pos.getX(), pos.getY(), pos.getZ());
                     nearestPlayer.getLevel().addFreshEntity(pokemonEntity);
+                    totalSpawns++;
                     lastSpawn = System.currentTimeMillis();
                 }
             }
