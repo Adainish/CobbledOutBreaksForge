@@ -5,6 +5,7 @@ import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
+import io.github.adainish.cobbledoutbreaksforge.config.Config;
 import io.github.adainish.cobbledoutbreaksforge.scheduler.AsyncScheduler;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
 import io.github.adainish.cobbledoutbreaksforge.util.Util;
@@ -26,13 +27,13 @@ public class OutBreak {
     public Species species;
     public int time = 5;
 
-    public int maxPokemon = 6;
 
-    public long started;
+    public long started = 0;
 
     public OutBreakLocation outBreakLocation;
 
     public int shinyChance = 1;
+    public long lastSpawn = 0;
 
     public transient AsyncScheduler scheduler;
 
@@ -45,6 +46,10 @@ public class OutBreak {
         while (selected == null)
         {
             Species generated = RandomHelper.getRandomElementFromCollection(Util.pokemonList());
+            if (!CobbledOutBreaksForge.config.whiteListed.isEmpty() && !CobbledOutBreaksForge.config.getWhiteListedSpecies().contains(species))
+                continue;
+            if (!CobbledOutBreaksForge.config.blackListed.isEmpty() && CobbledOutBreaksForge.config.getBlackListedSpecies().contains(generated))
+                continue;
             if (!CobbledOutBreaksForge.config.allowLegends && generated.create(1).isLegendary())
                 continue;
             if (!CobbledOutBreaksForge.config.allowUltraBeasts && generated.create(1).isUltraBeast())
@@ -55,8 +60,16 @@ public class OutBreak {
         this.species = selected;
     }
 
+    public boolean spawnTimerValid()
+    {
+        return System.currentTimeMillis() >= (lastSpawn = TimeUnit.SECONDS.toMillis(CobbledOutBreaksForge.config.secondsBetweenSpawns));
+    }
+
     public boolean shouldSpawnNewPokemon() {
-        return currentOutBreakAmount() < maxPokemon;
+        if (!spawnTimerValid())
+            return false;
+
+        return currentOutBreakAmount() < CobbledOutBreaksForge.config.maxSpawns;
     }
 
     public void killAllOutBreakMons()
@@ -153,6 +166,7 @@ public class OutBreak {
 
                     pokemonEntity.setPos(pos.getX(), pos.getY(), pos.getZ());
                     nearestPlayer.getLevel().addFreshEntity(pokemonEntity);
+                    lastSpawn = System.currentTimeMillis();
                 }
             }
         }

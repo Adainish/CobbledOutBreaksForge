@@ -98,6 +98,7 @@ public class OutbreaksManager
             {
                 location = new OutBreakLocation();
                 location.id = randomIDGenerator();
+                location.playerName = player.getName().getString();
                 location.minX = player.getX() - 15;
                 location.maxX = player.getX() + 35;
                 location.minY = 0;

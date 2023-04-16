@@ -6,6 +6,7 @@ public class OutBreakLocation
 {
 
     public String id = "example";
+    public String playerName = "";
     public double minX = 0.0D;
     public double minY = 0.0D;
     public double minZ = 0.0D;
@@ -22,12 +23,13 @@ public class OutBreakLocation
     {
         String pretty = CobbledOutBreaksForge.config.locationPlaceHolder;
         pretty = pretty
-                .replace("%minx%", String.valueOf(minX))
-                .replace("%maxx%", String.valueOf(maxX))
-                .replace("%miny%", String.valueOf(minY))
-                .replace("%maxy%", String.valueOf(maxY))
-                .replace("%minz%", String.valueOf(minZ))
-                .replace("%maxz%", String.valueOf(maxZ))
+                .replace("%minx%", String.valueOf((int) minX))
+                .replace("%maxx%", String.valueOf((int) maxX))
+                .replace("%miny%", String.valueOf((int) minY))
+                .replace("%maxy%", String.valueOf((int) maxY))
+                .replace("%minz%", String.valueOf((int) minZ))
+                .replace("%maxz%", String.valueOf((int) maxZ))
+                .replace("%player%", playerName)
         ;
         return pretty;
     }

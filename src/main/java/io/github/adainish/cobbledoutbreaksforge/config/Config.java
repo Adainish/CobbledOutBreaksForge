@@ -1,10 +1,12 @@
 package io.github.adainish.cobbledoutbreaksforge.config;
 
+import com.cobblemon.mod.common.pokemon.Species;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutBreakLocation;
 import io.github.adainish.cobbledoutbreaksforge.util.Adapters;
+import io.github.adainish.cobbledoutbreaksforge.util.Util;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ public class Config
     public int minLevel = 5;
     public int maxLevel = 35;
     public int maxOutBreaks = 0;
+    public int maxSpawns = 20;
+    public int secondsBetweenSpawns = 1;
     public int shinyChance = 0;
     public int timerMinutes = 0;
     public int delayMinutes = 0;
@@ -25,6 +29,9 @@ public class Config
     public String finishedBroadCastMessage = "";
     public String timerPlaceHolder = "";
     public String locationPlaceHolder = "";
+
+    public List<String> blackListed;
+    public List<String> whiteListed;
     public Config()
     {
         this.usePlayerLocations = false;
@@ -34,10 +41,14 @@ public class Config
         this.shinyChance = 1;
         this.timerMinutes = 5;
         this.delayMinutes = 1;
+        this.maxSpawns = 20;
+        this.secondsBetweenSpawns = 2;
         this.finishedBroadCastMessage = "&cAn outbreak for %species% has finished.";
         this.broadcastMessage = "&cAn outbreak has started with the pokemon %species% for %time% at %location%";
         this.timerPlaceHolder = "%hours% hours and %minutes% minutes";
         this.locationPlaceHolder = "Location: %minx% - %maxx%x %miny%-%maxy%y %minz%-%maxz%z";
+        this.whiteListed = new ArrayList<>();
+        this.blackListed = new ArrayList<>();
     }
 
     public static void writeConfig()
@@ -113,5 +124,23 @@ public class Config
             CobbledOutBreaksForge.getLog().warn(e);
         }
 
+    }
+
+    public List<Species> getBlackListedSpecies()
+    {
+        List<Species> species = new ArrayList<>();
+        for (String s:blackListed) {
+            species.add(Util.getSpeciesFromString(s));
+        }
+        return species;
+    }
+
+    public List<Species> getWhiteListedSpecies()
+    {
+        List<Species> species = new ArrayList<>();
+        for (String s:whiteListed) {
+            species.add(Util.getSpeciesFromString(s));
+        }
+        return species;
     }
 }
