@@ -9,7 +9,10 @@ import io.github.adainish.cobbledoutbreaksforge.scheduler.AsyncScheduler;
 import io.github.adainish.cobbledoutbreaksforge.util.Adapters;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
 import io.github.adainish.cobbledoutbreaksforge.util.Util;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.LevelResource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -92,19 +95,35 @@ public class OutbreaksManager
         //check if config
         if (CobbledOutBreaksForge.config.usePlayerLocations) {
             //yes? select random player
-            ServerPlayer player = RandomHelper.getRandomElementFromCollection(CobbledOutBreaksForge.getServer().getPlayerList().getPlayers());
-            //make outbreak location from player
-            if (player != null)
-            {
-                location = new OutBreakLocation();
-                location.id = randomIDGenerator();
-                location.playerName = player.getName().getString();
-                location.minX = player.getX() - 15;
-                location.maxX = player.getX() + 35;
-                location.minY = 0;
-                location.maxY = 255;
-                location.minZ = player.getZ() - 15;
-                location.maxZ = player.getZ() + 35;
+            ServerPlayer player = null;
+            if (CobbledOutBreaksForge.getServer().getPlayerList().getPlayers().isEmpty())
+                return location;
+            while (player == null) {
+                player = RandomHelper.getRandomElementFromCollection(CobbledOutBreaksForge.getServer().getPlayerList().getPlayers());
+                //make outbreak location from player
+                if (player != null) {
+                    if (player.isChangingDimension())
+                        continue;
+                    if (player.isDeadOrDying())
+                        continue;
+                    if (player.level.isClientSide)
+                        continue;
+                    if (CobbledOutBreaksForge.config.isBlackListedLevel((ServerLevel) player.level))
+                    {
+                        player = null;
+                        continue;
+                    }
+                    location = new OutBreakLocation();
+                    location.id = randomIDGenerator();
+                    location.playerName = player.getName().getString();
+                    location.minX = player.getX() - 15;
+                    location.maxX = player.getX() + 35;
+                    location.minY = 0;
+                    location.maxY = 255;
+                    location.minZ = player.getZ() - 15;
+                    location.maxZ = player.getZ() + 35;
+                    break;
+                }
             }
         }
 

@@ -7,6 +7,7 @@ import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutBreakLocation;
 import io.github.adainish.cobbledoutbreaksforge.util.Adapters;
 import io.github.adainish.cobbledoutbreaksforge.util.Util;
+import net.minecraft.server.level.ServerLevel;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,8 +31,9 @@ public class Config
     public String timerPlaceHolder = "";
     public String locationPlaceHolder = "";
 
-    public List<String> blackListed;
-    public List<String> whiteListed;
+    public List<String> blackListedWorlds = new ArrayList<>();
+    public List<String> blackListed = new ArrayList<>();
+    public List<String> whiteListed = new ArrayList<>();
     public Config()
     {
         this.usePlayerLocations = false;
@@ -124,6 +126,25 @@ public class Config
             CobbledOutBreaksForge.getLog().warn(e);
         }
 
+    }
+
+    public boolean isBlackListedLevel(ServerLevel level)
+    {
+
+        for (String s:CobbledOutBreaksForge.config.blackListedWorlds) {
+            if (s == null)
+                continue;
+            if (s.isBlank())
+                continue;
+            if (s.isEmpty())
+                continue;
+            if (Util.getWorld(s).isPresent())
+            {
+                if (level.equals(Util.getWorld(s).get()))
+                    return true;
+            }
+        }
+        return false;
     }
 
     public List<Species> getBlackListedSpecies()

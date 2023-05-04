@@ -3,12 +3,18 @@ package io.github.adainish.cobbledoutbreaksforge.util;
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Util
 {
@@ -69,5 +75,21 @@ public class Util
 
     public static String formattedString(String s) {
         return s.replaceAll("&", "§");
+    }
+
+    public static ResourceKey<Level> getDimension(String dimension) {
+        return dimension.isEmpty() ? null : getDimension(ResourceLocationHelper.of(dimension));
+    }
+
+    public static ResourceKey<Level> getDimension(ResourceLocation key) {
+        return ResourceKey.create(Registry.DIMENSION_REGISTRY, key);
+    }
+
+    public static Optional<ServerLevel> getWorld(ResourceKey<Level> key) {
+        return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getLevel(key));
+    }
+
+    public static Optional<ServerLevel> getWorld(String key) {
+        return getWorld(getDimension(key));
     }
 }
