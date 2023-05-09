@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CobbledOutBreaksForge.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CobbledOutBreaksForge.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/CobbledOutBreaksForge.test.iml" filepath="$PROJECT_DIR$/.idea/modules/CobbledOutBreaksForge.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io.github.adainish.CobbledOutBreaksForge.main.iml" filepath="$PROJECT_DIR$/.idea/modules/io.github.adainish.CobbledOutBreaksForge.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/io.github.adainish.CobbledOutBreaksForge.test.iml" filepath="$PROJECT_DIR$/.idea/modules/io.github.adainish.CobbledOutBreaksForge.test.iml" />
     </modules>
   </component>
 </project>
