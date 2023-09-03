@@ -147,7 +147,7 @@ public class CobbledOutBreaksForge {
     {
 
         AsyncScheduler.Builder builder = new AsyncScheduler.Builder();
-        AsyncScheduler updateOutBreaksRunnableTask = builder.withInfiniteIterations().withInterval(20)
+        AsyncScheduler updateOutBreaksRunnableTask = builder.withInfiniteIterations().withInterval((20 * 60))
                 .withRunnable(new UpdateOutBreaksRunnable())
                 .build();
         updateOutBreaksRunnableTask.start();
