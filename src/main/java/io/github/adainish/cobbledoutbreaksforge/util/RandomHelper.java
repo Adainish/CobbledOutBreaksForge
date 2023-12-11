@@ -1,7 +1,6 @@
 package io.github.adainish.cobbledoutbreaksforge.util;
 
 import com.google.common.collect.Sets;
-import com.mojang.math.Vector3d;
 
 import java.awt.*;
 import java.util.*;
@@ -9,7 +8,6 @@ import java.util.List;
 
 public class RandomHelper
 {
-    /** @deprecated */
     @Deprecated
     public static final Random rand = new Random();
 
@@ -31,9 +29,6 @@ public class RandomHelper
         }
     }
 
-    public static double getRandomNumberBetween(double min, double max) {
-        return useRandomForNumberBetween(rand, min, max);
-    }
     public static int getRandomNumberBetween(int min, int max) {
         return useRandomForNumberBetween(rand, min, max);
     }
@@ -66,10 +61,6 @@ public class RandomHelper
 
             return randomNumbers;
         }
-    }
-
-    public static double useRandomForNumberBetween(Random random, double min, double max) {
-        return random.nextDouble(Math.max(1, max - min + 1)) + min;
     }
 
     public static int useRandomForNumberBetween(Random random, int min, int max) {
@@ -158,16 +149,6 @@ public class RandomHelper
 
     public static Color getRandomHighSaturationColor() {
         return Color.getHSBColor(rand.nextFloat() * 360.0F, 1.0F, 1.0F);
-    }
-
-    public static Vector3d nextSpherePoint(double radius) {
-        double theta = rand.nextDouble() * 2.0 * Math.PI;
-        double phi = (rand.nextDouble() - 0.5) * Math.PI;
-        double rad = rand.nextDouble() * radius;
-        double x = rad * Math.cos(theta) * Math.cos(phi);
-        double y = rad * Math.sin(phi);
-        double z = rad * Math.sin(theta) * Math.cos(phi);
-        return new Vector3d(x, y, z);
     }
 
     public static <T> T getRandomElementFromCollection(Collection<T> collection) {

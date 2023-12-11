@@ -109,9 +109,7 @@ public class OutbreaksManager
                         continue;
                     if (player.isDeadOrDying())
                         continue;
-                    if (player.level.isClientSide)
-                        continue;
-                    if (CobbledOutBreaksForge.config.isBlackListedLevel((ServerLevel) player.level))
+                    if (CobbledOutBreaksForge.config.isBlackListedLevel(player.serverLevel()))
                     {
                         player = null;
                         tries++;
@@ -120,12 +118,12 @@ public class OutbreaksManager
                     location = new OutBreakLocation();
                     location.id = randomIDGenerator();
                     location.playerName = player.getName().getString();
-                    location.minX = player.getX() - 15;
-                    location.maxX = player.getX() + 35;
+                    location.minX = (int) (player.getX() - 15);
+                    location.maxX = (int) (player.getX() + 35);
                     location.minY = 0;
                     location.maxY = 255;
-                    location.minZ = player.getZ() - 15;
-                    location.maxZ = player.getZ() + 35;
+                    location.minZ = (int) (player.getZ() - 15);
+                    location.maxZ = (int) (player.getZ() + 35);
                     break;
                 }
             }
@@ -147,7 +145,7 @@ public class OutbreaksManager
         if (!CobbledOutBreaksForge.config.blackListedWorlds.isEmpty())
         {
             CobbledOutBreaksForge.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
-                if (!CobbledOutBreaksForge.config.isBlackListedLevel(serverPlayer.getLevel()))
+                if (!CobbledOutBreaksForge.config.isBlackListedLevel(serverPlayer.serverLevel()))
                     availablePlayers.set(true);
             });
         } else availablePlayers.set(true);
