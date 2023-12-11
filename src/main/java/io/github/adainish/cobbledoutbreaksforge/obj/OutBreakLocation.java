@@ -7,12 +7,12 @@ public class OutBreakLocation
 
     public String id = "example";
     public String playerName = "";
-    public double minX = 0.0D;
-    public double minY = 0.0D;
-    public double minZ = 0.0D;
-    public double maxX = 0.0D;
-    public double maxY = 0.0D;
-    public double maxZ = 0.0D;
+    public int minX = 0;
+    public int minY = 0;
+    public int minZ = 0;
+    public int maxX = 0;
+    public int maxY = 0;
+    public int maxZ = 0;
 
     public OutBreakLocation()
     {

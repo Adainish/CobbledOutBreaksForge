@@ -4,6 +4,7 @@ import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -82,7 +83,7 @@ public class Util
     }
 
     public static ResourceKey<Level> getDimension(ResourceLocation key) {
-        return ResourceKey.create(Registry.DIMENSION_REGISTRY, key);
+        return ResourceKey.create(Registries.DIMENSION, key);
     }
 
     public static Optional<ServerLevel> getWorld(ResourceKey<Level> key) {

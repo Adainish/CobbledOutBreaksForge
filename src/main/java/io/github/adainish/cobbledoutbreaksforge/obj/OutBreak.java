@@ -150,23 +150,23 @@ public class OutBreak {
                 pokemonProperties.setLevel(randomLevel);
                 pokemonProperties.setSpecies(species.getResourceIdentifier().getPath());
                 if (pokemonProperties.getSpecies() != null) {
-                    double newY = RandomHelper.getRandomNumberBetween(outBreakLocation.minY, outBreakLocation.maxY);//?Replace with highest block y?
-                    double newZ = RandomHelper.getRandomNumberBetween(outBreakLocation.minZ, outBreakLocation.maxZ);
-                    double newX = RandomHelper.getRandomNumberBetween(outBreakLocation.minX, outBreakLocation.maxX);
+                    int newY = RandomHelper.getRandomNumberBetween(outBreakLocation.minY, outBreakLocation.maxY);//?Replace with highest block y?
+                    int newZ = RandomHelper.getRandomNumberBetween(outBreakLocation.minZ, outBreakLocation.maxZ);
+                    int newX = RandomHelper.getRandomNumberBetween(outBreakLocation.minX, outBreakLocation.maxX);
 
-                    BlockPos pos = nearestPlayer.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, new BlockPos(newX, newY, newZ));
+                    BlockPos pos = nearestPlayer.serverLevel().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, new BlockPos(newX, newY, newZ));
 
                     int randomChance = getRandomChance();
                     if (randomChance <= shinyChance) {
                         pokemonProperties.setShiny(true);
                         SoundEvent soundEvent = SoundEvents.BLAZE_DEATH;
-                        nearestPlayer.level.playSound(null, nearestPlayer.getX(), nearestPlayer.getY(), nearestPlayer.getZ(), soundEvent, SoundSource.PLAYERS, 100.0F, 100.0F);
+                        nearestPlayer.serverLevel().playSound(null, nearestPlayer.getX(), nearestPlayer.getY(), nearestPlayer.getZ(), soundEvent, SoundSource.PLAYERS, 100.0F, 100.0F);
                     }
-                    PokemonEntity pokemonEntity = pokemonProperties.createEntity(nearestPlayer.getLevel());
+                    PokemonEntity pokemonEntity = pokemonProperties.createEntity(nearestPlayer.serverLevel());
                     pokemonEntity.getPersistentData().putBoolean("outbreakmon", true);
 
                     pokemonEntity.setPos(pos.getX(), pos.getY(), pos.getZ());
-                    nearestPlayer.getLevel().addFreshEntity(pokemonEntity);
+                    nearestPlayer.serverLevel().addFreshEntity(pokemonEntity);
                     totalSpawns++;
                     lastSpawn = System.currentTimeMillis();
                 }
