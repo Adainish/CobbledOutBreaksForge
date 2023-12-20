@@ -1,15 +1,15 @@
 package io.github.adainish.cobbledoutbreaksforge;
 
-import com.cobblemon.mod.common.api.scheduling.ScheduledTask;
-import com.cobblemon.mod.common.api.scheduling.ScheduledTaskTracker;
+import io.github.adainish.cobbledoutbreaksforge.cmd.Command;
 import io.github.adainish.cobbledoutbreaksforge.config.Config;
 import io.github.adainish.cobbledoutbreaksforge.listener.EntityListener;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutbreaksManager;
+import io.github.adainish.cobbledoutbreaksforge.obj.PreviousOutBreaks;
 import io.github.adainish.cobbledoutbreaksforge.scheduler.AsyncScheduler;
 import io.github.adainish.cobbledoutbreaksforge.tasks.UpdateOutBreaksRunnable;
-import kotlin.Unit;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -26,13 +26,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod(CobbledOutBreaksForge.MODID)
 public class CobbledOutBreaksForge {
 
-    // Define mod id in a common place for everything to reference
     public static final String MODID = "cobbledoutbreaksforge";
 
     public static final String MOD_NAME = "CobbledOutbreaks";
@@ -49,6 +46,8 @@ public class CobbledOutBreaksForge {
     public static Config config;
 
     public List<AsyncScheduler> taskList = new ArrayList<>();
+
+    public static PreviousOutBreaks previousOutBreaks;
 
     public CobbledOutBreaksForge() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -100,6 +99,12 @@ public class CobbledOutBreaksForge {
     }
 
     @SubscribeEvent
+    public void onCommandRegistry(RegisterCommandsEvent event)
+    {
+        event.getDispatcher().register(Command.getCommand());
+    }
+
+    @SubscribeEvent
     public void onServerStarted(ServerStartedEvent event) {
         setServer(ServerLifecycleHooks.getCurrentServer());
         reload();
@@ -125,6 +130,8 @@ public class CobbledOutBreaksForge {
     public void initConfigs() {
         Config.writeConfig();
         config = Config.getConfig();
+        PreviousOutBreaks.writeConfig();
+        previousOutBreaks = PreviousOutBreaks.getConfig();
     }
 
     public void reload() {
@@ -135,12 +142,18 @@ public class CobbledOutBreaksForge {
             }
             taskList.clear();
         }
-        initConfigs();
+        if (previousOutBreaks != null) {
+            log.info("Saving previous outbreaks");
+            previousOutBreaks.save();
+        }
+        this.initConfigs();
         if (outbreaksManager == null) {
             outbreaksManager = new OutbreaksManager();
         }
+        if (previousOutBreaks == null)
+            previousOutBreaks = new PreviousOutBreaks();
         outbreaksManager.init();
-        startTasks();
+        this.startTasks();
     }
 
     public void startTasks()

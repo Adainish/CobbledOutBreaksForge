@@ -218,7 +218,7 @@ public class OutbreaksManager
                 toremove.add(species);
             }
         });
-        for (Species species : toremove) {
+        toremove.forEach(species -> {
             OutBreak outBreak = outBreakHashMap.get(species);
             outBreak.scheduler.stop();
             outBreak.killAllOutBreakMons();
@@ -226,7 +226,9 @@ public class OutbreaksManager
                 Util.doBroadcast(CobbledOutBreaksForge.config.finishedBroadCastMessage.replace("%species%", species.getName()));
             outBreakHashMap.remove(species);
             this.lastOutBreak = System.currentTimeMillis();
-        }
+            if (CobbledOutBreaksForge.previousOutBreaks != null)
+                CobbledOutBreaksForge.previousOutBreaks.addOutBreak(outBreak);
+        });
     }
 
     public void shutdown()

@@ -2,6 +2,7 @@ package io.github.adainish.cobbledoutbreaksforge.obj;
 
 import com.cobblemon.mod.common.api.drop.DropTable;
 import com.cobblemon.mod.common.api.pokemon.PokemonProperties;
+import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
 import com.cobblemon.mod.common.pokemon.Species;
 import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
@@ -10,21 +11,25 @@ import io.github.adainish.cobbledoutbreaksforge.scheduler.AsyncScheduler;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
 import io.github.adainish.cobbledoutbreaksforge.util.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class OutBreak {
-    public Species species;
+    public transient Species species;
+    public String speciesIdentifier = "";
     public int time = 5;
 
     public long started = 0;
@@ -59,6 +64,7 @@ public class OutBreak {
 
         }
         this.species = selected;
+        this.speciesIdentifier = selected.getResourceIdentifier().toString();
     }
 
     public boolean spawnTimerValid()
@@ -75,10 +81,7 @@ public class OutBreak {
 
     public void killAllOutBreakMons()
     {
-        for (PokemonEntity entity:getWildOutBreakMons()) {
-            entity.setDrops(new DropTable());
-            entity.setHealth(-1);
-        }
+        getWildOutBreakMons().forEach(entity -> entity.remove(Entity.RemovalReason.DISCARDED));
         CobbledOutBreaksForge.getLog().warn("Cleared out all outbreak Pokemon");
     }
 
@@ -172,5 +175,10 @@ public class OutBreak {
                 }
             }
         }
+    }
+
+    public Optional<Species> getOptionalSpeciesFromID()
+    {
+        return Optional.ofNullable(PokemonSpecies.INSTANCE.getByIdentifier(new ResourceLocation(speciesIdentifier)));
     }
 }
