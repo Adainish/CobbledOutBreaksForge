@@ -1,58 +1,54 @@
 package io.github.adainish.cobbledoutbreaksforge.listener;
 
-import com.cobblemon.mod.common.api.Priority;
-import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity;
-import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
+import io.github.adainish.cabled.events.EntityTickCallback;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
-import kotlin.Unit;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+
 
 import java.util.Random;
 
 public class EntityListener
 {
-    @SubscribeEvent
-    public void onTick(LivingEvent.LivingTickEvent event)
+
+    public EntityListener()
     {
-        if (event.isCanceled())
-            return;
-        if (event.getEntity() == null)
-            return;
-
-        if (event.getEntity() instanceof PokemonEntity pokemonEntity) {
-            if (pokemonEntity.getPersistentData().getBoolean("outbreakmon")) {
-                Random rand = RandomHelper.rand;
-                if (rand.nextDouble(1) < 0.4) {
-                    float w = pokemonEntity.getBbWidth();
-                    float h = pokemonEntity.getBbHeight();
-
-                    CobbledOutBreaksForge.getServer().getPlayerList().getPlayers().stream().filter(pl -> pl.distanceTo(pokemonEntity) <= 30).forEach(pl -> {
-                        ServerLevel level = pl.serverLevel();
-                        level.sendParticles(
-                                ParticleTypes.CRIMSON_SPORE,
-                                pokemonEntity.getX() + ((rand.nextDouble() * 2.0) - 1) * (h + 1),
-                                pokemonEntity.getY() + (rand.nextDouble() * (h + 1)),
-                                pokemonEntity.getZ()+ (((rand.nextDouble() * 2.0) - 1) * (w + 1)),
-                                0,
-                                0D,
-                                1D,
-                                0D,
-                                1D);
-                    });
-                }
-            }
-        }
+        this.registerTick();
     }
 
-    public void subCap()
+    public void registerTick()
     {
-        CobblemonEvents.POKEMON_CAPTURED.subscribe(Priority.NORMAL, event -> {
-
-            return Unit.INSTANCE;
+        EntityTickCallback.EVENT.register(livingEntity -> {
+            if (livingEntity instanceof PokemonEntity pokemonEntity)
+            {
+                if (pokemonEntity.getPokemon().getPersistentData().getBoolean("outbreakmon"))
+                {
+                    Random rand = RandomHelper.rand;
+                    if (rand.nextDouble() < 0.4)
+                    {
+                        float w = pokemonEntity.getBbWidth();
+                        float h = pokemonEntity.getBbHeight();
+                        livingEntity.level().getNearbyPlayers(TargetingConditions.forNonCombat(), pokemonEntity, pokemonEntity.getBoundingBoxForCulling().inflate(30)).forEach(pl -> {
+                            if (pl.level() instanceof ServerLevel serverLevel) {
+                                serverLevel.sendParticles(
+                                        ParticleTypes.CRIMSON_SPORE,
+                                        pokemonEntity.getX() + ((rand.nextDouble() * 2.0) - 1) * (h + 1),
+                                        pokemonEntity.getY() + (rand.nextDouble() * (h + 1)),
+                                        pokemonEntity.getZ() + (((rand.nextDouble() * 2.0) - 1) * (w + 1)),
+                                        0,
+                                        0D,
+                                        1D,
+                                        0D,
+                                        1D);
+                            }
+                        });
+                    }
+                }
+            }
+            return InteractionResult.SUCCESS;
         });
     }
 

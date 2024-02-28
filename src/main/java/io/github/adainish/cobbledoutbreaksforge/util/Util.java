@@ -2,8 +2,7 @@ package io.github.adainish.cobbledoutbreaksforge.util;
 
 import com.cobblemon.mod.common.api.pokemon.PokemonSpecies;
 import com.cobblemon.mod.common.pokemon.Species;
-import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
-import net.minecraft.core.Registry;
+import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -11,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +22,7 @@ public class Util
     public static final long MINUTE_IN_MILLIS = 60000;
 
 
-    public static MinecraftServer server = CobbledOutBreaksForge.getServer();
+    public static MinecraftServer server = CobbledOutBreaks.getServer();
 
     private static final MinecraftServer SERVER = server;
 
@@ -87,7 +85,7 @@ public class Util
     }
 
     public static Optional<ServerLevel> getWorld(ResourceKey<Level> key) {
-        return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer().getLevel(key));
+        return Optional.ofNullable(CobbledOutBreaks.getServer().getLevel(key));
     }
 
     public static Optional<ServerLevel> getWorld(String key) {

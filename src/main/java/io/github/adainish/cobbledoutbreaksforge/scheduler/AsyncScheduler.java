@@ -2,10 +2,14 @@ package io.github.adainish.cobbledoutbreaksforge.scheduler;
 
 import java.util.function.Consumer;
 
-import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+import com.cobblemon.mod.common.api.Priority;
+import com.cobblemon.mod.common.api.reactive.ObservableSubscription;
+import com.cobblemon.mod.common.platform.events.PlatformEvents;
+import com.cobblemon.mod.common.platform.events.ServerTickEvent;
+import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaks;
+import kotlin.Unit;
+
 public class AsyncScheduler {
 
     private final int interval;
@@ -15,6 +19,9 @@ public class AsyncScheduler {
     private int iterationCount = 0;
     private boolean expired = false;
     private int ticksElapsed = 0;
+
+    public ObservableSubscription<ServerTickEvent> subscription;
+
 
     private AsyncScheduler(int interval, int iterations, Runnable runnable, Consumer<Void> consumerTask) {
         this.interval = interval;
@@ -27,13 +34,20 @@ public class AsyncScheduler {
         if (interval <= 0) {
             throw new IllegalStateException("Interval must be greater than 0");
         }
-        CobbledOutBreaksForge.getLog().debug("Starting async scheduler with interval of {} ticks and {} iterations", interval, iterations);
-        MinecraftForge.EVENT_BUS.register(this);
+        CobbledOutBreaks.getLog().debug("Starting async scheduler with interval of {} ticks and {} iterations", interval, iterations);
+        PlatformEvents.SERVER_TICK_PRE.subscribe(Priority.HIGHEST, t -> {
+            onServerTick();
+            return Unit.INSTANCE;
+        });
     }
 
     public void stop() {
         expired = true;
-        MinecraftForge.EVENT_BUS.unregister(this);
+        if (subscription != null) {
+            subscription.unsubscribe();
+        } else {
+            CobbledOutBreaks.getLog().warn("Attempted to stop async scheduler but no subscription was found");
+        }
     }
 
     private void execute() {
@@ -48,9 +62,7 @@ public class AsyncScheduler {
         }
     }
 
-    @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
+    public void onServerTick() {
             if (expired) {
                 return;
             }
@@ -59,7 +71,6 @@ public class AsyncScheduler {
                 ticksElapsed = 0;
                 execute();
             }
-        }
     }
 
     public static class Builder {

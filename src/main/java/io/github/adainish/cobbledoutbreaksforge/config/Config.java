@@ -3,7 +3,7 @@ package io.github.adainish.cobbledoutbreaksforge.config;
 import com.cobblemon.mod.common.pokemon.Species;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
+import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaks;
 import io.github.adainish.cobbledoutbreaksforge.obj.OutBreakLocation;
 import io.github.adainish.cobbledoutbreaksforge.util.Adapters;
 import io.github.adainish.cobbledoutbreaksforge.util.Util;
@@ -55,7 +55,7 @@ public class Config
 
     public static void writeConfig()
     {
-        File dir = CobbledOutBreaksForge.getConfigDir();
+        File dir = CobbledOutBreaks.getConfigDir();
         dir.mkdirs();
         Gson gson  = Adapters.PRETTY_MAIN_GSON;
         Config config = new Config();
@@ -70,13 +70,13 @@ public class Config
             writer.close();
         } catch (IOException e)
         {
-            CobbledOutBreaksForge.getLog().warn(e);
+            CobbledOutBreaks.getLog().warn(e);
         }
     }
 
     public static Config getConfig()
     {
-        File dir = CobbledOutBreaksForge.getConfigDir();
+        File dir = CobbledOutBreaks.getConfigDir();
         dir.mkdirs();
         Gson gson  = Adapters.PRETTY_MAIN_GSON;
         File file = new File(dir, "config.json");
@@ -84,7 +84,7 @@ public class Config
         try {
             reader = new JsonReader(new FileReader(file));
         } catch (FileNotFoundException e) {
-            CobbledOutBreaksForge.getLog().error("Something went wrong attempting to read the Config");
+            CobbledOutBreaks.getLog().error("Something went wrong attempting to read the Config");
             return null;
         }
 
@@ -106,7 +106,7 @@ public class Config
     }
     public void initDefaultLocations()
     {
-        File dir = CobbledOutBreaksForge.getStorage();
+        File dir = CobbledOutBreaks.getStorage();
         dir.mkdirs();
 
         Gson gson  = Adapters.PRETTY_MAIN_GSON;
@@ -123,7 +123,7 @@ public class Config
             }
         } catch (IOException e)
         {
-            CobbledOutBreaksForge.getLog().warn(e);
+            CobbledOutBreaks.getLog().warn(e);
         }
 
     }
@@ -131,7 +131,7 @@ public class Config
     public boolean isBlackListedLevel(ServerLevel level)
     {
 
-        for (String s:CobbledOutBreaksForge.config.blackListedWorlds) {
+        for (String s: CobbledOutBreaks.config.blackListedWorlds) {
             if (s == null)
                 continue;
             if (s.isBlank())

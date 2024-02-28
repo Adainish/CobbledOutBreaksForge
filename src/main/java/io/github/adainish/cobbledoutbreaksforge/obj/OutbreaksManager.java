@@ -3,13 +3,12 @@ package io.github.adainish.cobbledoutbreaksforge.obj;
 import com.cobblemon.mod.common.pokemon.Species;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
-import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaksForge;
+import io.github.adainish.cobbledoutbreaksforge.CobbledOutBreaks;
 import io.github.adainish.cobbledoutbreaksforge.config.Config;
 import io.github.adainish.cobbledoutbreaksforge.scheduler.AsyncScheduler;
 import io.github.adainish.cobbledoutbreaksforge.util.Adapters;
 import io.github.adainish.cobbledoutbreaksforge.util.RandomHelper;
 import io.github.adainish.cobbledoutbreaksforge.util.Util;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.io.File;
@@ -34,7 +33,7 @@ public class OutbreaksManager
 
     public OutbreaksManager()
     {
-        this.maxOutBreaks = CobbledOutBreaksForge.config.maxOutBreaks;
+        this.maxOutBreaks = CobbledOutBreaks.config.maxOutBreaks;
     }
 
     public void init()
@@ -47,13 +46,13 @@ public class OutbreaksManager
     }
 
     public void loadOutBreakLocations() {
-        if (CobbledOutBreaksForge.config != null) {
-            Config config = CobbledOutBreaksForge.config;
-            if (CobbledOutBreaksForge.getStorage().listFiles().length == 0) {
+        if (CobbledOutBreaks.config != null) {
+            Config config = CobbledOutBreaks.config;
+            if (CobbledOutBreaks.getStorage().listFiles().length == 0) {
                 config.initDefaultLocations();
             }
             //loop through files and turn into locations
-            for (File f:CobbledOutBreaksForge.getStorage().listFiles()) {
+            for (File f: CobbledOutBreaks.getStorage().listFiles()) {
                 if (f != null)
                 {
                     Gson gson = Adapters.PRETTY_MAIN_GSON;
@@ -92,24 +91,24 @@ public class OutbreaksManager
     {
         OutBreakLocation location = RandomHelper.getRandomElementFromCollection(locationHashMap.values());
         //check if config
-        if (CobbledOutBreaksForge.config.usePlayerLocations) {
+        if (CobbledOutBreaks.config.usePlayerLocations) {
             //yes? select random player
             ServerPlayer player = null;
-            if (CobbledOutBreaksForge.getServer().getPlayerList().getPlayers().isEmpty())
+            if (CobbledOutBreaks.getServer().getPlayerList().getPlayers().isEmpty())
                 return location;
             int tries = 0;
             int maxTries = 4;
             while (player == null) {
                 if (tries > maxTries)
                     break;
-                player = RandomHelper.getRandomElementFromCollection(CobbledOutBreaksForge.getServer().getPlayerList().getPlayers());
+                player = RandomHelper.getRandomElementFromCollection(CobbledOutBreaks.getServer().getPlayerList().getPlayers());
                 //make outbreak location from player
                 if (player != null) {
                     if (player.isChangingDimension())
                         continue;
                     if (player.isDeadOrDying())
                         continue;
-                    if (CobbledOutBreaksForge.config.isBlackListedLevel(player.serverLevel()))
+                    if (CobbledOutBreaks.config.isBlackListedLevel(player.serverLevel()))
                     {
                         player = null;
                         tries++;
@@ -135,17 +134,17 @@ public class OutbreaksManager
 
     public boolean canCreateNewOutBreak()
     {
-        return System.currentTimeMillis() >= (lastOutBreak + TimeUnit.MINUTES.toMillis(CobbledOutBreaksForge.config.delayMinutes));
+        return System.currentTimeMillis() >= (lastOutBreak + TimeUnit.MINUTES.toMillis(CobbledOutBreaks.config.delayMinutes));
     }
 
     public boolean anyAvailablePlayers()
     {
         AtomicBoolean availablePlayers = new AtomicBoolean(false);
 
-        if (!CobbledOutBreaksForge.config.blackListedWorlds.isEmpty())
+        if (!CobbledOutBreaks.config.blackListedWorlds.isEmpty())
         {
-            CobbledOutBreaksForge.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
-                if (!CobbledOutBreaksForge.config.isBlackListedLevel(serverPlayer.serverLevel()))
+            CobbledOutBreaks.getServer().getPlayerList().getPlayers().forEach(serverPlayer -> {
+                if (!CobbledOutBreaks.config.isBlackListedLevel(serverPlayer.serverLevel()))
                     availablePlayers.set(true);
             });
         } else availablePlayers.set(true);
@@ -154,8 +153,8 @@ public class OutbreaksManager
     }
 
     public void generateOutBreaks() {
-        if (CobbledOutBreaksForge.getServer() != null) {
-            if (CobbledOutBreaksForge.getServer().getPlayerCount() <= 0) {
+        if (CobbledOutBreaks.getServer() != null) {
+            if (CobbledOutBreaks.getServer().getPlayerCount() <= 0) {
                 return;
             }
             if (outBreakHashMap.values().size() >= maxOutBreaks)
@@ -177,15 +176,15 @@ public class OutbreaksManager
                 }
 
 
-                outBreak.time = CobbledOutBreaksForge.config.timerMinutes;
+                outBreak.time = CobbledOutBreaks.config.timerMinutes;
                 outBreak.outBreakLocation = getRandomOutBreakLocation();
                 if (outBreak.outBreakLocation == null) {
                     currentTries++;
                     continue;
                 }
-                outBreak.shinyChance = CobbledOutBreaksForge.config.shinyChance;
+                outBreak.shinyChance = CobbledOutBreaks.config.shinyChance;
                 //do announcement
-                String msg = CobbledOutBreaksForge.config.broadcastMessage;
+                String msg = CobbledOutBreaks.config.broadcastMessage;
                 Util.doBroadcast(msg
                         .replace("%species%", outBreak.species.getName())
                                 .replace("%time%", outBreak.timeLeft())
@@ -204,7 +203,7 @@ public class OutbreaksManager
                 outBreakHashMap.put(outBreak.species, outBreak);
             }
         } else {
-            CobbledOutBreaksForge.getLog().warn("Could not load server instance, failed to start outbreaks");
+            CobbledOutBreaks.getLog().warn("Could not load server instance, failed to start outbreaks");
         }
     }
 
@@ -222,8 +221,8 @@ public class OutbreaksManager
             OutBreak outBreak = outBreakHashMap.get(species);
             outBreak.scheduler.stop();
             outBreak.killAllOutBreakMons();
-            if (!CobbledOutBreaksForge.config.finishedBroadCastMessage.isBlank())
-                Util.doBroadcast(CobbledOutBreaksForge.config.finishedBroadCastMessage.replace("%species%", species.getName()));
+            if (!CobbledOutBreaks.config.finishedBroadCastMessage.isBlank())
+                Util.doBroadcast(CobbledOutBreaks.config.finishedBroadCastMessage.replace("%species%", species.getName()));
             outBreakHashMap.remove(species);
             this.lastOutBreak = System.currentTimeMillis();
         }
@@ -231,7 +230,7 @@ public class OutbreaksManager
 
     public void shutdown()
     {
-        CobbledOutBreaksForge.getLog().warn("Shutting down all ongoing outbreaks");
+        CobbledOutBreaks.getLog().warn("Shutting down all ongoing outbreaks");
         outBreakHashMap.forEach((species, outBreak) -> {
             outBreak.scheduler.stop();
             outBreak.killAllOutBreakMons();
