@@ -1,6 +1,7 @@
 package io.github.adainish.cobbledoutbreaksforge;
 
 import com.cobblemon.mod.common.api.Priority;
+import com.cobblemon.mod.common.api.events.CobblemonEvents;
 import com.cobblemon.mod.common.api.scheduling.ScheduledTask;
 import com.cobblemon.mod.common.api.scheduling.ScheduledTaskTracker;
 import com.cobblemon.mod.common.platform.events.PlatformEvents;
@@ -100,6 +101,12 @@ public class CobbledOutBreaks implements ModInitializer {
                 .replace("%y", YEAR)
         );
         initDirs();
+        CobblemonEvents.POKEMON_CAPTURED.subscribe(Priority.NORMAL, event -> {
+            if (outbreaksManager != null)
+                if (!event.getPokemon().getPersistentData().isEmpty() && event.getPokemon().getPersistentData().getBoolean("outbreakmon"))
+                    event.getPokemon().getPersistentData().putBoolean("outbreakmon", false);
+            return Unit.INSTANCE;
+        });
     }
 
     public void initDirs() {
