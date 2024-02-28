@@ -20,6 +20,7 @@ import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class OutBreak {
@@ -129,6 +130,10 @@ public class OutBreak {
 
     public int getRandomChance() {
         return (int) (Math.floor(Math.random() * 100) + 1);
+    }
+
+    public Optional<Species> getOptionalSpeciesFromID() {
+        return Optional.ofNullable(species);
     }
 
     public void spawnPokemon() {
